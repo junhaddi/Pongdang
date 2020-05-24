@@ -1,11 +1,13 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pongdang/screens/index_screen.dart';
 import 'package:pongdang/screens/walkthrough_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SharedPreferences.getInstance().then((prefs) {
     runApp(MyApp(prefs: prefs));
   });
