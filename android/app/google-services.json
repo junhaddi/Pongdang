@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "316966685673",
+    "firebase_url": "https://pongdang-3e25d.firebaseio.com",
+    "project_id": "pongdang-3e25d",
+    "storage_bucket": "pongdang-3e25d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316966685673:android:7680d43594d9447b6ed978",
+        "android_client_info": {
+          "package_name": "com.junhaddi.pongdang"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316966685673-8nemj5409rma6uol3odmc5oh1mmqapci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.junhaddi.pongdang",
+            "certificate_hash": "0e0878eeeae82b5ef02832c8549ab7f8c5c50b79"
+          }
+        },
+        {
+          "client_id": "316966685673-b8umf90nugere3dcunm2rp63ca0rmf79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL0j-HprHh9TGTfHbhkH0dPFdcPbBhWR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "316966685673-b8umf90nugere3dcunm2rp63ca0rmf79.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
