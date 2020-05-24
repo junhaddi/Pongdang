@@ -1,10 +1,10 @@
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pongdang/pages/calendar_page.dart';
 import 'package:pongdang/pages/home_page.dart';
 import 'package:pongdang/pages/setting_page.dart';
 import 'package:pongdang/pages/timer_page.dart';
+import 'package:pongdang/widgets/bottom_navy_bar.dart';
 import 'package:pongdang/widgets/custom_dialog.dart';
 
 class IndexScreen extends StatefulWidget {
