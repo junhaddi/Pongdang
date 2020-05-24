@@ -60,6 +60,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
+    - family: NanumBarunGothic
+      fonts:
+        - asset: assets/fonts/NanumBarunGothic.ttf
     - family: CustomIcons
       fonts:
         - asset: assets/icons/CustomIcons.ttf
