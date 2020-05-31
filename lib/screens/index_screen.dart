@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pongdang/models/history.dart';
 import 'package:pongdang/util.dart';
@@ -21,6 +22,8 @@ class _IndexScreenState extends State<IndexScreen> {
   CalendarController _calendarController;
   List<History> _historys = [];
   Map<DateTime, List> _events = {};
+  int headerYear = DateTime.now().year;
+  int headerMonth = DateTime.now().month;
 
   @override
   void initState() {
@@ -38,45 +41,79 @@ class _IndexScreenState extends State<IndexScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            AppBar(
+              elevation: 0.0,
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '$headerMonth월 $headerYear',
+                  style: TextStyle(
+                    fontSize: 32.0,
+                  ),
+                ),
+              ),
+              actions: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PopupMenuButton<String>(
+                    tooltip: '메뉴 표시',
+                    onSelected: (value) {
+                      print(value);
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return ['앙', '기', '모', '찌'].map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(choice),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
             TableCalendar(
               calendarController: _calendarController,
               events: _events,
-              availableCalendarFormats: const {
-                CalendarFormat.month: '한달',
-                CalendarFormat.twoWeeks: '2주',
-                CalendarFormat.week: '주간',
-              },
+              headerVisible: false,
               calendarStyle: CalendarStyle(
                 highlightSelected: false,
-              ),
-              headerStyle: HeaderStyle(
-                formatButtonShowsNext: false,
-                titleTextBuilder: (date, locale) {
-                  return '${date.month}월 ${date.year}';
-                },
-                titleTextStyle: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                formatButtonDecoration: BoxDecoration(
-                  color: Colors.blueAccent[700],
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
-                formatButtonTextStyle: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-                leftChevronIcon: Icon(Icons.arrow_back_ios),
-                rightChevronIcon: Icon(Icons.arrow_forward_ios),
               ),
               daysOfWeekStyle: DaysOfWeekStyle(dowTextBuilder: (date, locale) {
                 return Util.getWeekday(date.weekday);
               }),
               builders: CalendarBuilders(
+                todayDayBuilder: (context, date, events) {
+                  return Center(
+                    child: Container(
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${date.day}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
                 markersBuilder: (context, date, events, holidays) {
                   final children = <Widget>[];
                   if (events.isNotEmpty) {
@@ -104,6 +141,12 @@ class _IndexScreenState extends State<IndexScreen> {
                   return children;
                 },
               ),
+              onVisibleDaysChanged: (first, last, format) {
+                setState(() {
+                  headerYear = _calendarController.focusedDay.year;
+                  headerMonth = _calendarController.focusedDay.month;
+                });
+              },
               onDaySelected: (day, events) {
                 // 음주 기록 저장
                 _showCheckDialog(
@@ -119,7 +162,6 @@ class _IndexScreenState extends State<IndexScreen> {
             Expanded(
               child: _historys.isEmpty
                   ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
                           '👏',
@@ -155,11 +197,6 @@ class _IndexScreenState extends State<IndexScreen> {
                         children: _historys.reversed
                             .map(
                               (History history) => InkWellCard(
-                                baseBorderRadius: BorderRadius.circular(4.0),
-                                baseMarginValue: EdgeInsets.only(
-                                  left: 4.0,
-                                  right: 4.0,
-                                ),
                                 onTap: () {
                                   setState(() {
                                     _calendarController
@@ -167,14 +204,23 @@ class _IndexScreenState extends State<IndexScreen> {
                                   });
                                 },
                                 child: ListTile(
-                                  title: Text(
-                                    history.title,
-                                  ),
-                                  trailing: Container(
-                                    width: 40.0,
+                                  leading: Container(
+                                    width: 8.0,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Util.getColor(history.level),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    history.title,
+                                  ),
+                                  subtitle: Text(
+                                    history.subtitle,
+                                  ),
+                                  trailing: Text(
+                                    Util.getEmoji(history.level),
+                                    style: TextStyle(
+                                      fontSize: 32.0,
                                     ),
                                   ),
                                 ),

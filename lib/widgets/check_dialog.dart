@@ -72,7 +72,6 @@ class _CheckDialogState extends State<CheckDialog> {
             divisions: 4,
             onChanged: (value) {
               setState(() {
-                print(rating);
                 rating = value;
               });
             },
