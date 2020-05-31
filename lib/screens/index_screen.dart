@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:pongdang/models/history.dart';
+import 'package:pongdang/util.dart';
+import 'package:pongdang/widgets/check_dialog.dart';
 import 'package:pongdang/widgets/inkwell_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -72,49 +74,27 @@ class _IndexScreenState extends State<IndexScreen> {
                 rightChevronIcon: Icon(Icons.arrow_forward_ios),
               ),
               daysOfWeekStyle: DaysOfWeekStyle(dowTextBuilder: (date, locale) {
-                String week;
-                switch (date.weekday) {
-                  case 1:
-                    week = '월';
-                    break;
-                  case 2:
-                    week = '화';
-                    break;
-                  case 3:
-                    week = '수';
-                    break;
-                  case 4:
-                    week = '목';
-                    break;
-                  case 5:
-                    week = '금';
-                    break;
-                  case 6:
-                    week = '토';
-                    break;
-                  case 7:
-                    week = '일';
-                    break;
-                }
-                return week;
+                return Util.getWeekday(date.weekday);
               }),
               builders: CalendarBuilders(
                 markersBuilder: (context, date, events, holidays) {
                   final children = <Widget>[];
                   if (events.isNotEmpty) {
                     children.add(
-                      Container(
-                        height: 40.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: events[0],
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${date.day}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                      Center(
+                        child: Container(
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Util.getColor(events[0]),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${date.day}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -125,22 +105,17 @@ class _IndexScreenState extends State<IndexScreen> {
                 },
               ),
               onDaySelected: (day, events) {
-                setState(() {
-                  _historys.add(
-                    History(
-                      dateTime: day,
-                      title: '$day',
-                      level: 4,
-                    ),
-                  );
-                  _historys.sort((a, b) => a.dateTime.compareTo(b.dateTime));
-                  _events.addAll({
-                    // TODO 색상 깊이 변경, sharedpreferences 저장
-                    day: [Colors.red]
-                  });
-                });
+                // 음주 기록 저장
+                _showCheckDialog(
+                  day,
+                  events.isEmpty ? 0.0 : events[0].toDouble(),
+                  _historys,
+                  _events,
+                  widget.prefs,
+                );
               },
             ),
+            Divider(),
             Expanded(
               child: _historys.isEmpty
                   ? Column(
@@ -174,36 +149,39 @@ class _IndexScreenState extends State<IndexScreen> {
                         ),
                       ],
                     )
-                  : ListView(
-                      children: _historys.reversed
-                          .map(
-                            (History history) => InkWellCard(
-                              baseBorderRadius: BorderRadius.circular(4.0),
-                              baseMarginValue: EdgeInsets.only(
-                                left: 4.0,
-                                right: 4.0,
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  _calendarController
-                                      .setSelectedDay(history.dateTime);
-                                });
-                              },
-                              child: ListTile(
-                                title: Text(
-                                  history.title,
+                  : ScrollConfiguration(
+                      behavior: MyBehavior(),
+                      child: ListView(
+                        children: _historys.reversed
+                            .map(
+                              (History history) => InkWellCard(
+                                baseBorderRadius: BorderRadius.circular(4.0),
+                                baseMarginValue: EdgeInsets.only(
+                                  left: 4.0,
+                                  right: 4.0,
                                 ),
-                                trailing: Container(
-                                  width: 40.0,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red,
+                                onTap: () {
+                                  setState(() {
+                                    _calendarController
+                                        .setSelectedDay(history.dateTime);
+                                  });
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                    history.title,
+                                  ),
+                                  trailing: Container(
+                                    width: 40.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Util.getColor(history.level),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                          .toList(),
+                            )
+                            .toList(),
+                      ),
                     ),
             ),
           ],
@@ -219,17 +197,48 @@ class _IndexScreenState extends State<IndexScreen> {
       // 음주 기록 불러오기
       dateHistoryList.forEach((element) {
         Map dateMap = jsonDecode(element);
+        DateTime day = DateTime.fromMillisecondsSinceEpoch(dateMap['dateTime']);
         _historys.add(
           History(
-            dateTime: dateMap['dateTime'],
+            dateTime: day,
             title: '${dateMap['title']}',
+            subtitle: '${dateMap['subtitle']}',
             level: dateMap['level'],
           ),
         );
         _events.addAll({
-          dateMap['dateTime']: [dateMap['level']]
+          day: [dateMap['level']],
         });
       });
+      _historys.sort((a, b) => a.dateTime.compareTo(b.dateTime));
     });
+  }
+
+  Future<void> _showCheckDialog(
+      DateTime dateTime,
+      double rating,
+      List<History> historys,
+      Map<DateTime, List> events,
+      SharedPreferences prefs) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CheckDialog(
+          dateTime: dateTime,
+          rating: rating,
+          historys: historys,
+          events: events,
+          prefs: prefs,
+        );
+      },
+    );
+  }
+}
+
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }
