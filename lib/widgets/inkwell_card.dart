@@ -13,7 +13,7 @@ class InkWellCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.0),
+      margin: EdgeInsets.symmetric(horizontal: 12.0),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: baseBorderRadius),
         child: InkWell(

@@ -70,15 +70,20 @@ class _CheckDialogState extends State<CheckDialog> {
             min: 0.0,
             max: 4.0,
             divisions: 4,
+            activeColor: Util.getColor(rating),
             onChanged: (value) {
               setState(() {
                 rating = value;
               });
             },
           ),
-          Text(
-            '한방울도 마시지 않았어요',
-          ),
+          Text(rating == 0
+              ? '한방울도 마시지 않았어요'
+              : rating == 1
+                  ? '기분좋게 한두잔 마셨어요'
+                  : rating == 2
+                      ? '시간 가는 줄 모르고 마셨어요'
+                      : rating == 3 ? '취할 정도로 전투적으로 마셨어요' : '필름 끊길 정도로 마셨어요'),
           SizedBox(
             height: 20.0,
           ),

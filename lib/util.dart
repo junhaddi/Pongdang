@@ -4,13 +4,13 @@ class Util {
   static Color getColor(double val) {
     Color color;
     if (val == 0.0) {
-      color = Colors.transparent;
+      color = Colors.grey;
     } else if (val == 1.0) {
       color = Colors.blue;
     } else if (val == 2.0) {
       color = Colors.green;
     } else if (val == 3.0) {
-      color = Colors.deepOrange;
+      color = Colors.deepPurple;
     } else {
       color = Colors.red;
     }
