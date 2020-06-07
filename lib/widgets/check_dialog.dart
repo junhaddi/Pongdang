@@ -108,14 +108,16 @@ class _CheckDialogState extends State<CheckDialog> {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 onPressed: () {
-                  String title =
-                      '${widget.dateTime.month}월 ${widget.dateTime.day}일(${Util.getWeekday(widget.dateTime.weekday)})';
-                  String subtitle = '${widget.dateTime.year}년';
+                  String title = '${widget.dateTime.year % 100}.'
+                      '${widget.dateTime.month < 10 ? '0' : ''}'
+                      '${widget.dateTime.month}.'
+                      '${widget.dateTime.day < 10 ? '0' : ''}'
+                      '${widget.dateTime.day}'
+                      '(${Util.getWeekday(widget.dateTime.weekday)})';
                   widget.historys.add(
                     History(
                       dateTime: widget.dateTime,
                       title: title,
-                      subtitle: subtitle,
                       level: rating,
                     ),
                   );
@@ -130,7 +132,6 @@ class _CheckDialogState extends State<CheckDialog> {
                     jsonEncode({
                       'dateTime': widget.dateTime.millisecondsSinceEpoch,
                       'title': title,
-                      'subtitle': subtitle,
                       'level': rating,
                     }),
                   );

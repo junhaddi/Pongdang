@@ -6,13 +6,13 @@ class Util {
     if (val == 0.0) {
       color = Colors.grey;
     } else if (val == 1.0) {
-      color = Colors.blue;
+      color = Colors.lightBlue;
     } else if (val == 2.0) {
-      color = Colors.green;
+      color = Colors.amber;
     } else if (val == 3.0) {
       color = Colors.deepPurple;
     } else {
-      color = Colors.red;
+      color = Colors.pink;
     }
     return color;
   }
