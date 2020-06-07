@@ -20,6 +20,7 @@ class _IndexScreenState extends State<IndexScreen> {
   CalendarController _calendarController;
   List<History> _historys = [];
   Map<DateTime, List> _events = {};
+  String _subtitle = '날짜를 눌러서 음주한 날을 기록하세요!';
 
   @override
   void initState() {
@@ -129,6 +130,9 @@ class _IndexScreenState extends State<IndexScreen> {
                         return children;
                       },
                     ),
+                    onVisibleDaysChanged: (first, last, format) {
+                      _updateDrink();
+                    },
                     onDaySelected: (day, events) {
                       if (day.isBefore(DateTime.now().add(Duration(days: 1)))) {
                         // 음주 기록 저장
@@ -216,7 +220,7 @@ class _IndexScreenState extends State<IndexScreen> {
                               padding: EdgeInsets.only(
                                   left: 16.0, top: 24.0, bottom: 20.0),
                               child: Text(
-                                '이번달 음주 횟수(${0}회)',
+                                _subtitle,
                                 style: TextStyle(
                                   fontSize: 18.0,
                                   shadows: [
@@ -298,6 +302,19 @@ class _IndexScreenState extends State<IndexScreen> {
         });
       });
       _historys.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+    });
+  }
+
+  void _updateDrink() {
+    setState(() {
+      int drinkDay = 0;
+      _historys.forEach((element) {
+        if (_calendarController.focusedDay.year == element.dateTime.year &&
+            _calendarController.focusedDay.month == element.dateTime.month) {
+          drinkDay += 1;
+        }
+      });
+      _subtitle = '이번달 음주 횟수($drinkDay회)';
     });
   }
 
@@ -462,6 +479,7 @@ class _IndexScreenState extends State<IndexScreen> {
                               }
                               widget.prefs
                                   .setStringList('dateHistorys', dateHistorys);
+                              _updateDrink();
                               Navigator.of(context).pop();
                             },
                     ),
