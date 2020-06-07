@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pongdang/models/history.dart';
 import 'package:pongdang/util.dart';
-import 'package:pongdang/widgets/check_dialog.dart';
 import 'package:pongdang/widgets/inkwell_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -135,12 +133,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       if (day.isBefore(DateTime.now().add(Duration(days: 1)))) {
                         // 음주 기록 저장
                         _showCheckDialog(
-                          day,
-                          events.isEmpty ? 0.0 : events[0].toDouble(),
-                          _historys,
-                          _events,
-                          widget.prefs,
-                        );
+                            day, events.isEmpty ? 0.0 : events[0].toDouble());
                       } else {
                         _calendarController.setSelectedDay(DateTime.now());
                         Scaffold.of(ctx).removeCurrentSnackBar();
@@ -179,7 +172,8 @@ class _IndexScreenState extends State<IndexScreen> {
               Expanded(
                 child: _historys.isEmpty
                     ? Container(
-                        color: Colors.orangeAccent,
+                        width: double.infinity,
+                        color: Colors.lightGreen,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -203,7 +197,7 @@ class _IndexScreenState extends State<IndexScreen> {
                               height: 10.0,
                             ),
                             Text(
-                              '퐁당퐁당 개발진이 여러분의 음주습관 개선을 응원합니다.\n항상 건강하시고 행복하세요 :)',
+                              '퐁당퐁당 개발진이 여러분의 음주습관 개선을 응원합니다.\n항상 건강하시고 행복하세요  : )',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontStyle: FontStyle.italic,
@@ -213,7 +207,8 @@ class _IndexScreenState extends State<IndexScreen> {
                         ),
                       )
                     : Container(
-                        color: Colors.black12,
+                        width: double.infinity,
+                        color: Colors.lightGreen,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -221,9 +216,15 @@ class _IndexScreenState extends State<IndexScreen> {
                               padding: EdgeInsets.only(
                                   left: 16.0, top: 24.0, bottom: 20.0),
                               child: Text(
-                                '이번달 음주 횟수(${12}회)',
+                                '이번달 음주 횟수(${0}회)',
                                 style: TextStyle(
                                   fontSize: 18.0,
+                                  shadows: [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 2.0,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -248,12 +249,6 @@ class _IndexScreenState extends State<IndexScreen> {
                                                 shape: BoxShape.circle,
                                                 color: Util.getColor(
                                                     history.level),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey,
-                                                    blurRadius: 2.0,
-                                                  ),
-                                                ],
                                               ),
                                             ),
                                             title: Text(
@@ -306,24 +301,183 @@ class _IndexScreenState extends State<IndexScreen> {
     });
   }
 
-  Future<void> _showCheckDialog(
-      DateTime dateTime,
-      double rating,
-      List<History> historys,
-      Map<DateTime, List> events,
-      SharedPreferences prefs) async {
+  Future<void> _showCheckDialog(DateTime day, double _rating) async {
+    double rating = _rating;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CheckDialog(
-          dateTime: dateTime,
-          rating: rating,
-          historys: historys,
-          events: events,
-          prefs: prefs,
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox(
+                  height: 20.0,
+                ),
+                Text(
+                  '${day.month}월 ${day.day}일(${Util.getWeekday(day.weekday)})',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Text(
+                  Util.getEmoji(rating),
+                  style: TextStyle(
+                    fontSize: 48.0,
+                  ),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Slider(
+                  value: rating,
+                  min: 0.0,
+                  max: 4.0,
+                  divisions: 4,
+                  activeColor: Util.getColor(rating),
+                  onChanged: (value) {
+                    setState(() {
+                      rating = value;
+                    });
+                  },
+                ),
+                Text(rating == 0.0
+                    ? '한방울도 마시지 않았어요'
+                    : rating == 1.0
+                        ? '기분좋게 한두잔 마셨어요'
+                        : rating == 2.0
+                            ? '시간 가는 줄 모르고 마셨어요'
+                            : rating == 3.0
+                                ? '취할 정도로 잔뜩 마셨어요'
+                                : '필름 끊길 정도로 마셨어요'),
+                SizedBox(
+                  height: 10.0,
+                ),
+                ButtonBar(
+                  buttonMinWidth: 80.0,
+                  buttonHeight: 40.0,
+                  alignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    RaisedButton(
+                      child: Text('취소'),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    RaisedButton(
+                      color: Colors.green,
+                      child: Text('확인'),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      onPressed: rating == _rating
+                          ? null
+                          : () {
+                              String title = '${day.year % 100}.'
+                                  '${day.month < 10 ? '0' : ''}'
+                                  '${day.month}.'
+                                  '${day.day < 10 ? '0' : ''}'
+                                  '${day.day}'
+                                  '(${Util.getWeekday(day.weekday)})';
+                              List<String> dateHistorys =
+                                  widget.prefs.getStringList('dateHistorys') ??
+                                      [];
+                              if (rating == 0.0) {
+                                // 음주 기록 삭제
+                                for (int i = 0; i < _historys.length; i++) {
+                                  if (_historys[i]
+                                      .dateTime
+                                      .isAtSameMomentAs(day)) {
+                                    _historys.removeAt(i);
+                                  }
+                                }
+                                _events.removeWhere(
+                                    (key, value) => key.isAtSameMomentAs(day));
+                                dateHistorys.removeWhere((element) {
+                                  Map dateMap = jsonDecode(element);
+                                  return DateTime.fromMillisecondsSinceEpoch(
+                                          dateMap['dateTime'])
+                                      .isAtSameMomentAs(day);
+                                });
+                              } else if (_rating == 0.0) {
+                                // 새로운 음주 기록 추가
+                                _historys.add(
+                                  History(
+                                    dateTime: day,
+                                    title: title,
+                                    level: rating,
+                                  ),
+                                );
+                                _events.addAll({
+                                  day: [rating]
+                                });
+                                _historys.sort(
+                                    (a, b) => a.dateTime.compareTo(b.dateTime));
+                                dateHistorys.add(
+                                  jsonEncode({
+                                    'dateTime': day.millisecondsSinceEpoch,
+                                    'title': title,
+                                    'level': rating,
+                                  }),
+                                );
+                              } else {
+                                // 음주 기록 변경
+                                _historys.forEach((element) {
+                                  if (element.dateTime.isAtSameMomentAs(day)) {
+                                    element.level = rating;
+                                  }
+                                });
+                                _events.forEach((key, value) {
+                                  if (key.isAtSameMomentAs(day)) {
+                                    _events.update(key, (value) {
+                                      return [rating];
+                                    });
+                                  }
+                                });
+                                dateHistorys.removeWhere((element) {
+                                  Map dateMap = jsonDecode(element);
+                                  return DateTime.fromMillisecondsSinceEpoch(
+                                          dateMap['dateTime'])
+                                      .isAtSameMomentAs(day);
+                                });
+                                dateHistorys.add(
+                                  jsonEncode({
+                                    'dateTime': day.millisecondsSinceEpoch,
+                                    'title': title,
+                                    'level': rating,
+                                  }),
+                                );
+                              }
+                              widget.prefs
+                                  .setStringList('dateHistorys', dateHistorys);
+                              Navigator.of(context).pop();
+                            },
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+              ],
+            );
+          }),
         );
       },
-    );
+    ).then((value) {
+      setState(() {});
+    });
   }
 }
 
