@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:pongdang/models/history.dart';
@@ -212,7 +213,27 @@ class _IndexScreenState extends State<IndexScreen> {
                       )
                     : Container(
                         width: double.infinity,
-                        color: Colors.lightGreen,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              stops: [
+                                0.1,
+                                0.4,
+                                0.6,
+                                0.9
+                              ],
+                              colors: [
+                                Colors.yellow,
+                                Colors.red,
+                                Colors.indigo,
+                                Colors.teal
+                              ]),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(30.0),
+                            topLeft: Radius.circular(30.0),
+                          ),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -223,12 +244,6 @@ class _IndexScreenState extends State<IndexScreen> {
                                 _subtitle,
                                 style: TextStyle(
                                   fontSize: 18.0,
-                                  shadows: [
-                                    BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 2.0,
-                                    ),
-                                  ],
                                 ),
                               ),
                             ),
