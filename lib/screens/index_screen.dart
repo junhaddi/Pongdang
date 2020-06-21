@@ -79,12 +79,6 @@ class _IndexScreenState extends State<IndexScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.grey,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 2.0,
-                                ),
-                              ],
                             ),
                             child: Center(
                               child: Text(
@@ -100,6 +94,10 @@ class _IndexScreenState extends State<IndexScreen> {
                       },
                       markersBuilder: (context, date, events, holidays) {
                         final children = <Widget>[];
+                        double opacity =
+                            date.month != _calendarController.focusedDay.month
+                                ? 0.4
+                                : 1.0;
                         if (events.isNotEmpty) {
                           children.add(
                             Center(
@@ -107,13 +105,8 @@ class _IndexScreenState extends State<IndexScreen> {
                                 height: 40.0,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Util.getColor(events[0]),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey,
-                                      blurRadius: 2.0,
-                                    ),
-                                  ],
+                                  color: Util.getColor(events[0])
+                                      .withOpacity(opacity),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -161,24 +154,19 @@ class _IndexScreenState extends State<IndexScreen> {
                       }
                     },
                   ),
-                  Container(
-                    width: 20.0,
-                    height: 3.0,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
                 ],
               ),
               Expanded(
                 child: _historys.isEmpty
                     ? Container(
                         width: double.infinity,
-                        color: Colors.lightGreen,
+                        decoration: BoxDecoration(
+                          color: Colors.lightGreen,
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(20.0),
+                            topLeft: Radius.circular(20.0),
+                          ),
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -214,24 +202,10 @@ class _IndexScreenState extends State<IndexScreen> {
                     : Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                              stops: [
-                                0.1,
-                                0.4,
-                                0.6,
-                                0.9
-                              ],
-                              colors: [
-                                Colors.yellow,
-                                Colors.red,
-                                Colors.indigo,
-                                Colors.teal
-                              ]),
+                          color: Colors.lightGreen,
                           borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(30.0),
-                            topLeft: Radius.circular(30.0),
+                            topRight: Radius.circular(20.0),
+                            topLeft: Radius.circular(20.0),
                           ),
                         ),
                         child: Column(
@@ -239,12 +213,22 @@ class _IndexScreenState extends State<IndexScreen> {
                           children: <Widget>[
                             Padding(
                               padding: EdgeInsets.only(
-                                  left: 16.0, top: 24.0, bottom: 20.0),
-                              child: Text(
-                                _subtitle,
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                ),
+                                  left: 16.0,
+                                  right: 16.0,
+                                  top: 24.0,
+                                  bottom: 20.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    _subtitle,
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                  Icon(Icons.graphic_eq),
+                                ],
                               ),
                             ),
                             Expanded(
