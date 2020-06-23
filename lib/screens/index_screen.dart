@@ -154,6 +154,17 @@ class _IndexScreenState extends State<IndexScreen> {
                       }
                     },
                   ),
+                  Container(
+                    width: 20.0,
+                    height: 3.0,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
                 ],
               ),
               Expanded(
@@ -213,10 +224,11 @@ class _IndexScreenState extends State<IndexScreen> {
                           children: <Widget>[
                             Padding(
                               padding: EdgeInsets.only(
-                                  left: 16.0,
-                                  right: 16.0,
-                                  top: 24.0,
-                                  bottom: 20.0),
+                                left: 16.0,
+                                right: 24.0,
+                                top: 24.0,
+                                bottom: 20.0,
+                              ),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -227,7 +239,12 @@ class _IndexScreenState extends State<IndexScreen> {
                                       fontSize: 18.0,
                                     ),
                                   ),
-                                  Icon(Icons.graphic_eq),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed('/state');
+                                    },
+                                    child: Icon(Icons.list),
+                                  ),
                                 ],
                               ),
                             ),

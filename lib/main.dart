@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pongdang/screens/index_screen.dart';
 import 'package:pongdang/screens/splash_screen.dart';
+import 'package:pongdang/screens/state_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
         '/index': (BuildContext context) => IndexScreen(prefs: prefs),
+        '/state': (BuildContext context) => StateScreen(prefs: prefs),
       },
       home: SplashScreen(),
     );
