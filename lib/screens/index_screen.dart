@@ -125,7 +125,9 @@ class _IndexScreenState extends State<IndexScreen> {
                       _updateBottomColor();
                     },
                     onDaySelected: (day, events) {
-                      if (day.isBefore(DateTime.now().add(Duration(days: 1)))) {
+                      DateTime date = DateTime.now().add(Duration(days: 1));
+                      if (day.isBefore(
+                          DateTime(date.year, date.month, date.day))) {
                         // 음주 기록 저장
                         _showCheckDialog(
                             day, events.isEmpty ? 0.0 : events[0].toDouble());
@@ -165,9 +167,11 @@ class _IndexScreenState extends State<IndexScreen> {
                 ],
               ),
               Expanded(
-                child: Container(
+                child: AnimatedContainer(
                   width: double.infinity,
                   color: bottomColor,
+                  duration: Duration(seconds: 1),
+                  curve: Curves.fastOutSlowIn,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
