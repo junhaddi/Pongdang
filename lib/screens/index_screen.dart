@@ -22,7 +22,8 @@ class _IndexScreenState extends State<IndexScreen> {
   CalendarController _calendarController;
   List<History> _historys = [];
   Map<DateTime, List> _events = {};
-  Color bottomColor = Util.getColor(0.0);
+  Color _bottomColor;
+  String _subtitle = '';
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _IndexScreenState extends State<IndexScreen> {
     _calendarController = CalendarController();
     _getHistoryDate();
     Timer(Duration(milliseconds: 1), () {
-      _updateBottomColor();
+      _update();
     });
   }
 
@@ -129,7 +130,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       },
                     ),
                     onVisibleDaysChanged: (first, last, format) {
-                      _updateBottomColor();
+                      _update();
                     },
                     onDaySelected: (day, events) {
                       DateTime date = DateTime.now().add(Duration(days: 1));
@@ -176,7 +177,7 @@ class _IndexScreenState extends State<IndexScreen> {
               Expanded(
                 child: AnimatedContainer(
                   width: double.infinity,
-                  color: bottomColor,
+                  color: _bottomColor,
                   duration: Duration(seconds: 1),
                   curve: Curves.fastOutSlowIn,
                   child: _historys.isEmpty
@@ -211,37 +212,59 @@ class _IndexScreenState extends State<IndexScreen> {
                             ),
                           ],
                         )
-                      : ListView(
-                          children: _historys.reversed
-                              .map(
-                                (History history) => InkWellCard(
-                                  onTap: () {
-                                    setState(() {
-                                      _calendarController
-                                          .setSelectedDay(history.dateTime);
-                                    });
-                                  },
-                                  child: ListTile(
-                                    leading: Container(
-                                      width: 8.0,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Util.getColor(history.level),
-                                      ),
-                                    ),
-                                    title: Text(
-                                      history.title,
-                                    ),
-                                    trailing: Text(
-                                      Util.getEmoji(history.level),
-                                      style: TextStyle(
-                                        fontSize: 32.0,
-                                      ),
-                                    ),
-                                  ),
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding:
+                                  EdgeInsets.fromLTRB(16.0, 24.0, 24.0, 20.0),
+                              child: Text(
+                                _subtitle,
+                                style: TextStyle(
+                                  fontSize: 18.0,
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            ),
+                            Expanded(
+                              child: ScrollConfiguration(
+                                behavior: MyBehavior(),
+                                child: ListView(
+                                  children: _historys.reversed
+                                      .map(
+                                        (History history) => InkWellCard(
+                                          onTap: () {
+                                            setState(() {
+                                              _calendarController
+                                                  .setSelectedDay(
+                                                      history.dateTime);
+                                            });
+                                          },
+                                          child: ListTile(
+                                            leading: Container(
+                                              width: 8.0,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Util.getColor(
+                                                    history.level),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              history.title,
+                                            ),
+                                            trailing: Text(
+                                              Util.getEmoji(history.level),
+                                              style: TextStyle(
+                                                fontSize: 32.0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                 ),
               ),
@@ -275,9 +298,10 @@ class _IndexScreenState extends State<IndexScreen> {
     });
   }
 
-  void _updateBottomColor() {
+  void _update() {
     setState(() {
       List level = [0, 0, 0, 0];
+      int drinkDay = 0;
       _events.forEach((key, value) {
         if (_calendarController.focusedDay.year == key.year &&
             _calendarController.focusedDay.month == key.month) {
@@ -290,8 +314,10 @@ class _IndexScreenState extends State<IndexScreen> {
           } else {
             level[3]++;
           }
+          drinkDay++;
         }
       });
+      _subtitle = '이번달 음주 횟수($drinkDay회)';
       int maxVal = level[0];
       for (int i = 1; i < 4; i++) {
         if (maxVal < level[i]) {
@@ -299,15 +325,15 @@ class _IndexScreenState extends State<IndexScreen> {
         }
       }
       if (maxVal == 0) {
-        bottomColor = Util.getColor(0.0);
+        _bottomColor = Util.getColor(0.0);
       } else if (maxVal == level[3]) {
-        bottomColor = Util.getColor(4.0);
+        _bottomColor = Util.getColor(4.0);
       } else if (maxVal == level[2]) {
-        bottomColor = Util.getColor(3.0);
+        _bottomColor = Util.getColor(3.0);
       } else if (maxVal == level[1]) {
-        bottomColor = Util.getColor(2.0);
+        _bottomColor = Util.getColor(2.0);
       } else {
-        bottomColor = Util.getColor(1.0);
+        _bottomColor = Util.getColor(1.0);
       }
     });
   }
@@ -473,7 +499,7 @@ class _IndexScreenState extends State<IndexScreen> {
                               }
                               widget.prefs
                                   .setStringList('dateHistorys', dateHistorys);
-                              _updateBottomColor();
+                              _update();
                               Navigator.of(context).pop();
                             },
                     ),
@@ -490,5 +516,13 @@ class _IndexScreenState extends State<IndexScreen> {
     ).then((value) {
       setState(() {});
     });
+  }
+}
+
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }
