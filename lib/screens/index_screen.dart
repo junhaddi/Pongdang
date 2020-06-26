@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:pongdang/models/history.dart';
 import 'package:pongdang/util.dart';
+import 'package:pongdang/widgets/inkwell_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -17,6 +20,7 @@ class IndexScreen extends StatefulWidget {
 
 class _IndexScreenState extends State<IndexScreen> {
   CalendarController _calendarController;
+  List<History> _historys = [];
   Map<DateTime, List> _events = {};
   Color bottomColor = Util.getColor(0.0);
 
@@ -25,6 +29,9 @@ class _IndexScreenState extends State<IndexScreen> {
     super.initState();
     _calendarController = CalendarController();
     _getHistoryDate();
+    Timer(Duration(milliseconds: 1), () {
+      _updateBottomColor();
+    });
   }
 
   @override
@@ -172,37 +179,70 @@ class _IndexScreenState extends State<IndexScreen> {
                   color: bottomColor,
                   duration: Duration(seconds: 1),
                   curve: Curves.fastOutSlowIn,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        '👏',
-                        style: TextStyle(
-                          fontSize: 48.0,
+                  child: _historys.isEmpty
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              '👏',
+                              style: TextStyle(
+                                fontSize: 48.0,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Text(
+                              '날짜를 눌러서 음주한 날을 기록하세요!',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Text(
+                              '퐁당퐁당 개발진이 여러분의 음주습관 개선을 응원합니다.\n항상 건강하시고 행복하세요  : )',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        )
+                      : ListView(
+                          children: _historys.reversed
+                              .map(
+                                (History history) => InkWellCard(
+                                  onTap: () {
+                                    setState(() {
+                                      _calendarController
+                                          .setSelectedDay(history.dateTime);
+                                    });
+                                  },
+                                  child: ListTile(
+                                    leading: Container(
+                                      width: 8.0,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Util.getColor(history.level),
+                                      ),
+                                    ),
+                                    title: Text(
+                                      history.title,
+                                    ),
+                                    trailing: Text(
+                                      Util.getEmoji(history.level),
+                                      style: TextStyle(
+                                        fontSize: 32.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        '날짜를 눌러서 음주한 날을 기록하세요!',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        '퐁당퐁당 개발진이 여러분의 음주습관 개선을 응원합니다.\n항상 건강하시고 행복하세요  : )',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -220,10 +260,18 @@ class _IndexScreenState extends State<IndexScreen> {
       dateHistoryList.forEach((element) {
         Map dateMap = jsonDecode(element);
         DateTime day = DateTime.fromMillisecondsSinceEpoch(dateMap['dateTime']);
+        _historys.add(
+          History(
+            dateTime: day,
+            title: '${dateMap['title']}',
+            level: dateMap['level'],
+          ),
+        );
         _events.addAll({
           day: [dateMap['level']],
         });
       });
+      _historys.sort((a, b) => a.dateTime.compareTo(b.dateTime));
     });
   }
 
@@ -359,6 +407,13 @@ class _IndexScreenState extends State<IndexScreen> {
                                       [];
                               if (rating == 0.0) {
                                 // 음주 기록 삭제
+                                for (int i = 0; i < _historys.length; i++) {
+                                  if (_historys[i]
+                                      .dateTime
+                                      .isAtSameMomentAs(day)) {
+                                    _historys.removeAt(i);
+                                  }
+                                }
                                 _events.removeWhere(
                                     (key, value) => key.isAtSameMomentAs(day));
                                 dateHistorys.removeWhere((element) {
@@ -369,9 +424,18 @@ class _IndexScreenState extends State<IndexScreen> {
                                 });
                               } else if (_rating == 0.0) {
                                 // 새로운 음주 기록 추가
+                                _historys.add(
+                                  History(
+                                    dateTime: day,
+                                    title: title,
+                                    level: rating,
+                                  ),
+                                );
                                 _events.addAll({
                                   day: [rating]
                                 });
+                                _historys.sort(
+                                    (a, b) => a.dateTime.compareTo(b.dateTime));
                                 dateHistorys.add(
                                   jsonEncode({
                                     'dateTime': day.millisecondsSinceEpoch,
@@ -381,6 +445,11 @@ class _IndexScreenState extends State<IndexScreen> {
                                 );
                               } else {
                                 // 음주 기록 변경
+                                _historys.forEach((element) {
+                                  if (element.dateTime.isAtSameMomentAs(day)) {
+                                    element.level = rating;
+                                  }
+                                });
                                 _events.forEach((key, value) {
                                   if (key.isAtSameMomentAs(day)) {
                                     _events.update(key, (value) {
