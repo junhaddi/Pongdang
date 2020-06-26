@@ -23,11 +23,21 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('힘내라 대한민국'),
-            SizedBox(
-              height: 10.0,
+            Icon(
+              Icons.favorite,
+              size: 48.0,
+              color: Colors.red,
             ),
-            Icon(Icons.favorite),
+            SizedBox(
+              height: 20.0,
+            ),
+            Text(
+              '사랑하는 아빠\n\n가정의 평화를 위해\n아들이 직접\n\n 음주습관 개선 앱을\n개발했습니다',
+              style: TextStyle(
+                fontSize: 24.0,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
