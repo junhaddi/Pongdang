@@ -22,9 +22,9 @@ class _IndexScreenState extends State<IndexScreen> {
   CalendarController _calendarController;
   List<History> _historys = [];
   Map<DateTime, List> _events = {};
-  int _monthPerDrink;
   Color _bottomColor;
   String _subtitle = '';
+  bool _isLiverBroken = false;
 
   @override
   void initState() {
@@ -61,7 +61,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       centerHeaderTitle: true,
                       formatButtonVisible: false,
                       titleTextBuilder: (date, locale) {
-                        return '${date.year}년 ${date.month < 10 ? '0' : ''}${date.month}월\n이번달 음주 : $_monthPerDrink회';
+                        return '${date.year}년 ${date.month < 10 ? '0' : ''}${date.month}월';
                       },
                       titleTextStyle: TextStyle(
                         fontSize: 28.0,
@@ -212,7 +212,6 @@ class _IndexScreenState extends State<IndexScreen> {
                               '퐁당퐁당 개발진이 여러분의 음주습관 개선을 응원합니다.\n항상 건강하시고 행복하세요  : )',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 16.0,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
@@ -235,8 +234,11 @@ class _IndexScreenState extends State<IndexScreen> {
                                     ),
                                   ),
                                   Image(
-                                    image:
-                                        AssetImage('assets/images/liver.png'),
+                                    image: AssetImage(
+                                      _isLiverBroken
+                                          ? 'assets/images/liver_2.png'
+                                          : 'assets/images/liver_1.png',
+                                    ),
                                     height: 40.0,
                                   ),
                                 ],
@@ -318,8 +320,22 @@ class _IndexScreenState extends State<IndexScreen> {
   void _update() {
     setState(() {
       List level = [0, 0, 0, 0];
-      _monthPerDrink = 0;
+      int health = 0;
+      DateTime date = DateTime.now().subtract(Duration(days: 7));
       _events.forEach((key, value) {
+        // 간 건강 체크
+        if (key.isAfter(DateTime(date.year, date.month, date.day))) {
+          if (value[0] == 1.0) {
+            health += 2;
+          } else if (value[0] == 2.0) {
+            health += 4;
+          } else if (value[0] == 3.0) {
+            health += 6;
+          } else {
+            health += 10;
+          }
+        }
+        // 음주량 색상 통계
         if (_calendarController.focusedDay.year == key.year &&
             _calendarController.focusedDay.month == key.month) {
           if (value[0] == 1.0) {
@@ -331,10 +347,10 @@ class _IndexScreenState extends State<IndexScreen> {
           } else {
             level[3]++;
           }
-          _monthPerDrink++;
         }
       });
       _subtitle = '술마신날(${_events.length})';
+      _isLiverBroken = health < 10 ? false : true;
       int maxVal = level[0];
       for (int i = 1; i < 4; i++) {
         if (maxVal < level[i]) {
