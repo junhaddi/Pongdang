@@ -24,6 +24,7 @@ class _IndexScreenState extends State<IndexScreen> {
   Map<DateTime, List> _events = {};
   Color _bottomColor;
   String _subtitle = '';
+  String _focusDate = '';
   bool _isLiverBroken = false;
 
   @override
@@ -51,26 +52,37 @@ class _IndexScreenState extends State<IndexScreen> {
             children: <Widget>[
               Column(
                 children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          _focusDate,
+                          style: TextStyle(
+                            fontSize: 28.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        GestureDetector(
+                          child: Icon(
+                            Icons.equalizer,
+                            size: 32.0,
+                            color: Colors.grey,
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/status');
+                          },
+                        )
+                      ],
+                    ),
+                  ),
                   TableCalendar(
                     calendarController: _calendarController,
                     events: _events,
+                    headerVisible: false,
                     calendarStyle: CalendarStyle(
                       highlightSelected: false,
-                    ),
-                    headerStyle: HeaderStyle(
-                      centerHeaderTitle: true,
-                      formatButtonVisible: false,
-                      titleTextBuilder: (date, locale) {
-                        return '${date.year}년 ${date.month < 10 ? '0' : ''}${date.month}월';
-                      },
-                      titleTextStyle: TextStyle(
-                        fontSize: 28.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      leftChevronIcon: Icon(Icons.arrow_back_ios),
-                      rightChevronIcon: Icon(Icons.arrow_forward_ios),
-                      leftChevronMargin: EdgeInsets.all(12.0),
-                      rightChevronMargin: EdgeInsets.all(12.0),
                     ),
                     daysOfWeekStyle: DaysOfWeekStyle(
                       dowTextBuilder: (date, locale) {
@@ -165,17 +177,6 @@ class _IndexScreenState extends State<IndexScreen> {
                         );
                       }
                     },
-                  ),
-                  Container(
-                    width: 20.0,
-                    height: 3.0,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.0,
                   ),
                 ],
               ),
@@ -350,6 +351,8 @@ class _IndexScreenState extends State<IndexScreen> {
         }
       });
       _subtitle = '술마신날(${_events.length})';
+      _focusDate =
+          '${_calendarController.focusedDay.year}년 ${_calendarController.focusedDay.month}월';
       _isLiverBroken = health < 10 ? false : true;
       int maxVal = level[0];
       for (int i = 1; i < 4; i++) {
