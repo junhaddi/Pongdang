@@ -1,18 +1,18 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:pongdang/models/header.dart';
+import 'package:pongdang/models/history.dart';
 import 'package:pongdang/util.dart';
 import 'package:pongdang/widgets/status_graph.dart';
 import 'package:pongdang/widgets/status_header.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class StatusScreen extends StatefulWidget {
-  final SharedPreferences prefs;
+  final List<History> historys;
 
-  StatusScreen({this.prefs});
+  StatusScreen({this.historys});
 
   @override
   _StatusScreenState createState() => _StatusScreenState();
@@ -20,7 +20,7 @@ class StatusScreen extends StatefulWidget {
 
 class _StatusScreenState extends State<StatusScreen> {
   final SwiperController _swiperController = SwiperController();
-  Color _backgroundColor = Colors.blue;
+  Color _backgroundColor;
   List<Header> _headerList = [];
   List _historyList = [];
   List _level = [
@@ -34,6 +34,37 @@ class _StatusScreenState extends State<StatusScreen> {
   void initState() {
     super.initState();
     _getHistoryDate();
+    if (widget.historys.isEmpty) {
+      _backgroundColor = Util.getColor(0.0);
+      _headerList
+          .add(Header(emoji: Util.getEmoji(0.0), dateTime: DateTime.now()));
+    } else {
+      setState(() {
+        if (_headerList[0].emoji == Util.getEmoji(4.0)) {
+          _backgroundColor = Util.getColor(4.0);
+        } else if (_headerList[0].emoji == Util.getEmoji(3.0)) {
+          _backgroundColor = Util.getColor(3.0);
+        } else if (_headerList[0].emoji == Util.getEmoji(2.0)) {
+          _backgroundColor = Util.getColor(2.0);
+        } else if (_headerList[0].emoji == Util.getEmoji(1.0)) {
+          _backgroundColor = Util.getColor(1.0);
+        }
+        _level[0]['value'] = _historyList[0][0];
+        _level[1]['value'] = _historyList[0][1];
+        _level[2]['value'] = _historyList[0][2];
+        _level[3]['value'] = _historyList[0][3];
+      });
+
+      // 그래프 애니메이션 효과
+      Timer(Duration(milliseconds: 1), () {
+        setState(() {
+          _level[0]['width'] = _historyList[0][4];
+          _level[2]['width'] = _historyList[0][6];
+          _level[1]['width'] = _historyList[0][5];
+          _level[3]['width'] = _historyList[0][7];
+        });
+      });
+    }
   }
 
   @override
@@ -143,27 +174,39 @@ class _StatusScreenState extends State<StatusScreen> {
     );
   }
 
-  Future<void> _getHistoryDate() async {
-    setState(() {
-      List<String> dateHistoryList =
-          widget.prefs.getStringList('dateHistorys') ?? [];
-      // 날짜 정렬
-      dateHistoryList.sort((a, b) =>
-          jsonDecode(b)['dateTime'].compareTo(jsonDecode(a)['dateTime']));
-      if (dateHistoryList.isNotEmpty) {
-        List<double> level = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-        DateTime minDateTime = DateTime.fromMillisecondsSinceEpoch(
-            jsonDecode(dateHistoryList[0])['dateTime']);
-        minDateTime = DateTime(minDateTime.year, minDateTime.month);
-        dateHistoryList.forEach((element) {
-          Map dateMap = jsonDecode(element);
-          DateTime dateTime =
-              DateTime.fromMillisecondsSinceEpoch(dateMap['dateTime']);
-          dateTime = DateTime(dateTime.year, dateTime.month);
-          if (minDateTime.isAfter(dateTime)) {
+  void _getHistoryDate() {
+    if (widget.historys.isNotEmpty) {
+      List<double> level = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+      DateTime minDateTime = widget.historys[0].dateTime;
+      minDateTime = DateTime(minDateTime.year, minDateTime.month);
+      widget.historys.asMap().forEach((index, element) {
+        DateTime dateTime = element.dateTime;
+        dateTime = DateTime(dateTime.year, dateTime.month);
+        if (element.level == 1.0) {
+          level[0]++;
+        } else if (element.level == 2.0) {
+          level[1]++;
+        } else if (element.level == 3.0) {
+          level[2]++;
+        } else if (element.level == 4.0) {
+          level[3]++;
+        }
+        if (index != widget.historys.length - 1) {
+          DateTime afterDateTime = widget.historys[index + 1].dateTime;
+          afterDateTime = DateTime(afterDateTime.year, afterDateTime.month);
+          if (dateTime.isAfter(afterDateTime)) {
             double maxVal = level.reduce(max);
-            _headerList
-                .add(Header(emoji: Util.getEmoji(maxVal), dateTime: dateTime));
+            String emoji;
+            if (maxVal == level[3]) {
+              emoji = Util.getEmoji(4.0);
+            } else if (maxVal == level[2]) {
+              emoji = Util.getEmoji(3.0);
+            } else if (maxVal == level[1]) {
+              emoji = Util.getEmoji(2.0);
+            } else if (maxVal == level[0]) {
+              emoji = Util.getEmoji(1.0);
+            }
+            _headerList.add(Header(emoji: emoji, dateTime: dateTime));
             level[4] = (level[0] / maxVal) * 260 + 12;
             level[5] = (level[1] / maxVal) * 260 + 12;
             level[6] = (level[2] / maxVal) * 260 + 12;
@@ -171,19 +214,29 @@ class _StatusScreenState extends State<StatusScreen> {
             _historyList.add(level);
             level = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
             minDateTime = dateTime;
-          } else {
-            if (dateMap['level'] == 1.0) {
-              level[0]++;
-            } else if (dateMap['level'] == 2.0) {
-              level[1]++;
-            } else if (dateMap['level'] == 3.0) {
-              level[2]++;
-            } else if (dateMap['level'] == 4.0) {
-              level[3]++;
-            }
           }
-        });
-      }
-    });
+        } else {
+          double maxVal = level.reduce(max);
+          String emoji;
+          if (maxVal == level[3]) {
+            emoji = Util.getEmoji(4.0);
+          } else if (maxVal == level[2]) {
+            emoji = Util.getEmoji(3.0);
+          } else if (maxVal == level[1]) {
+            emoji = Util.getEmoji(2.0);
+          } else if (maxVal == level[0]) {
+            emoji = Util.getEmoji(1.0);
+          }
+          _headerList.add(Header(emoji: emoji, dateTime: dateTime));
+          level[4] = (level[0] / maxVal) * 260 + 12;
+          level[5] = (level[1] / maxVal) * 260 + 12;
+          level[6] = (level[2] / maxVal) * 260 + 12;
+          level[7] = (level[3] / maxVal) * 260 + 12;
+          _historyList.add(level);
+          level = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+          minDateTime = dateTime;
+        }
+      });
+    }
   }
 }

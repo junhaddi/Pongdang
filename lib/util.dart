@@ -11,7 +11,7 @@ class Util {
       color = Colors.orange;
     } else if (val == 3.0) {
       color = Colors.redAccent;
-    } else {
+    } else if (val == 4.0) {
       color = Colors.red[900];
     }
     return color;
@@ -27,7 +27,7 @@ class Util {
       emoji = '😔';
     } else if (val == 3.0) {
       emoji = '😭';
-    } else {
+    } else if (val == 4.0) {
       emoji = '😡';
     }
     return emoji;

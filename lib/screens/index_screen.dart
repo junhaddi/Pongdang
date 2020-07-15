@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:pongdang/models/history.dart';
+import 'package:pongdang/screens/status_screen.dart';
 import 'package:pongdang/util.dart';
 import 'package:pongdang/widgets/inkwell_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,7 +73,14 @@ class _IndexScreenState extends State<IndexScreen> {
                             color: Colors.grey,
                           ),
                           onTap: () {
-                            Navigator.of(context).pushNamed('/status');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => StatusScreen(
+                                  historys: _historys,
+                                ),
+                              ),
+                            );
                           },
                         )
                       ],
@@ -154,8 +163,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       if (day.isBefore(
                           DateTime(date.year, date.month, date.day))) {
                         // 음주 기록 저장
-                        _showCheckDialog(
-                            day, events.isEmpty ? 0.0 : events[0].toDouble());
+                        _showCheckDialog(day, events.isEmpty ? 0.0 : events[0]);
                       } else {
                         _calendarController.setSelectedDay(DateTime.now());
                         Scaffold.of(ctx).removeCurrentSnackBar();
@@ -212,9 +220,6 @@ class _IndexScreenState extends State<IndexScreen> {
                             Text(
                               '퐁당퐁당 개발진이 여러분의 음주습관 개선을 응원합니다.\n항상 건강하시고 행복하세요  : )',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                              ),
                             ),
                           ],
                         )
@@ -231,7 +236,6 @@ class _IndexScreenState extends State<IndexScreen> {
                                     _subtitle,
                                     style: TextStyle(
                                       fontSize: 20.0,
-                                      fontStyle: FontStyle.italic,
                                     ),
                                   ),
                                   Image(
@@ -249,7 +253,7 @@ class _IndexScreenState extends State<IndexScreen> {
                               child: ScrollConfiguration(
                                 behavior: MyBehavior(),
                                 child: ListView(
-                                  children: _historys.reversed
+                                  children: _historys
                                       .map(
                                         (History history) => InkWellCard(
                                           onTap: () {
@@ -314,13 +318,13 @@ class _IndexScreenState extends State<IndexScreen> {
           day: [dateMap['level']],
         });
       });
-      _historys.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+      _historys.sort((a, b) => b.dateTime.compareTo(a.dateTime));
     });
   }
 
   void _update() {
     setState(() {
-      List level = [0, 0, 0, 0];
+      List<int> level = [0, 0, 0, 0];
       int health = 0;
       DateTime date = DateTime.now().subtract(Duration(days: 7));
       _events.forEach((key, value) {
@@ -332,7 +336,7 @@ class _IndexScreenState extends State<IndexScreen> {
             health += 4;
           } else if (value[0] == 3.0) {
             health += 6;
-          } else {
+          } else if (value[0] == 4.0) {
             health += 10;
           }
         }
@@ -345,7 +349,7 @@ class _IndexScreenState extends State<IndexScreen> {
             level[1]++;
           } else if (value[0] == 3.0) {
             level[2]++;
-          } else {
+          } else if (value[0] == 4.0) {
             level[3]++;
           }
         }
@@ -353,13 +357,8 @@ class _IndexScreenState extends State<IndexScreen> {
       _subtitle = '술마신날(${_events.length})';
       _focusDate =
           '${_calendarController.focusedDay.year}년 ${_calendarController.focusedDay.month}월';
-      _isLiverBroken = health < 10 ? false : true;
-      int maxVal = level[0];
-      for (int i = 1; i < 4; i++) {
-        if (maxVal < level[i]) {
-          maxVal = level[i];
-        }
-      }
+      _isLiverBroken = health >= 10;
+      int maxVal = level.reduce(max);
       if (maxVal == 0) {
         _bottomColor = Util.getColor(0.0);
       } else if (maxVal == level[3]) {
@@ -368,7 +367,7 @@ class _IndexScreenState extends State<IndexScreen> {
         _bottomColor = Util.getColor(3.0);
       } else if (maxVal == level[1]) {
         _bottomColor = Util.getColor(2.0);
-      } else {
+      } else if (maxVal == level[0]) {
         _bottomColor = Util.getColor(1.0);
       }
     });
@@ -497,7 +496,7 @@ class _IndexScreenState extends State<IndexScreen> {
                                   day: [rating]
                                 });
                                 _historys.sort(
-                                    (a, b) => a.dateTime.compareTo(b.dateTime));
+                                    (a, b) => b.dateTime.compareTo(a.dateTime));
                                 dateHistorys.add(
                                   jsonEncode({
                                     'dateTime': day.millisecondsSinceEpoch,
