@@ -83,7 +83,6 @@ class _StatusScreenState extends State<StatusScreen> {
                 ),
                 Swiper.children(
                   controller: _swiperController,
-                  loop: false,
                   children: _headerList
                       .map(
                         (Header header) => StatusHeader(
@@ -129,6 +128,46 @@ class _StatusScreenState extends State<StatusScreen> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SafeArea(
+                      child: Padding(
+                        padding: EdgeInsets.all(48.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white.withOpacity(0.4),
+                          ),
+                          iconSize: 24.0,
+                          onPressed: () {
+                            _swiperController.previous();
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: SafeArea(
+                      child: Padding(
+                        padding: EdgeInsets.all(48.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.white.withOpacity(0.4),
+                          ),
+                          iconSize: 24.0,
+                          onPressed: () {
+                            _swiperController.next();
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -207,10 +246,10 @@ class _StatusScreenState extends State<StatusScreen> {
               emoji = Util.getEmoji(1.0);
             }
             _headerList.add(Header(emoji: emoji, dateTime: dateTime));
-            level[4] = (level[0] / maxVal) * 260 + 12;
-            level[5] = (level[1] / maxVal) * 260 + 12;
-            level[6] = (level[2] / maxVal) * 260 + 12;
-            level[7] = (level[3] / maxVal) * 260 + 12;
+            level[4] = (level[0] / maxVal) * 220 + 12;
+            level[5] = (level[1] / maxVal) * 220 + 12;
+            level[6] = (level[2] / maxVal) * 220 + 12;
+            level[7] = (level[3] / maxVal) * 220 + 12;
             _historyList.add(level);
             level = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
             minDateTime = dateTime;
@@ -228,10 +267,10 @@ class _StatusScreenState extends State<StatusScreen> {
             emoji = Util.getEmoji(1.0);
           }
           _headerList.add(Header(emoji: emoji, dateTime: dateTime));
-          level[4] = (level[0] / maxVal) * 260 + 12;
-          level[5] = (level[1] / maxVal) * 260 + 12;
-          level[6] = (level[2] / maxVal) * 260 + 12;
-          level[7] = (level[3] / maxVal) * 260 + 12;
+          level[4] = (level[0] / maxVal) * 220 + 12;
+          level[5] = (level[1] / maxVal) * 220 + 12;
+          level[6] = (level[2] / maxVal) * 220 + 12;
+          level[7] = (level[3] / maxVal) * 220 + 12;
           _historyList.add(level);
           level = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
           minDateTime = dateTime;
