@@ -83,6 +83,7 @@ class _StatusScreenState extends State<StatusScreen> {
                 ),
                 Swiper.children(
                   controller: _swiperController,
+                  loop: _headerList.length > 1,
                   children: _headerList
                       .map(
                         (Header header) => StatusHeader(
@@ -131,46 +132,50 @@ class _StatusScreenState extends State<StatusScreen> {
                     ),
                   ),
                 ),
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.all(48.0),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white.withOpacity(0.4),
+                _headerList.length > 1
+                    ? Positioned.fill(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: SafeArea(
+                            child: Padding(
+                              padding: EdgeInsets.all(48.0),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.white.withOpacity(0.4),
+                                ),
+                                iconSize: 24.0,
+                                onPressed: () {
+                                  _swiperController.previous();
+                                },
+                              ),
+                            ),
                           ),
-                          iconSize: 24.0,
-                          onPressed: () {
-                            _swiperController.previous();
-                          },
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned.fill(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.all(48.0),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.white.withOpacity(0.4),
+                      )
+                    : Container(),
+                _headerList.length > 1
+                    ? Positioned.fill(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: SafeArea(
+                            child: Padding(
+                              padding: EdgeInsets.all(48.0),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white.withOpacity(0.4),
+                                ),
+                                iconSize: 24.0,
+                                onPressed: () {
+                                  _swiperController.next();
+                                },
+                              ),
+                            ),
                           ),
-                          iconSize: 24.0,
-                          onPressed: () {
-                            _swiperController.next();
-                          },
                         ),
-                      ),
-                    ),
-                  ),
-                ),
+                      )
+                    : Container(),
               ],
             ),
           ),
