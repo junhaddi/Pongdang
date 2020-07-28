@@ -35,7 +35,7 @@ class _IndexScreenState extends State<IndexScreen> {
     _calendarController = CalendarController();
     _getHistoryDate();
     Timer(Duration(milliseconds: 1), () {
-      _update();
+      _update(false, DateTime.now());
     });
   }
 
@@ -156,7 +156,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       },
                     ),
                     onVisibleDaysChanged: (first, last, format) {
-                      _update();
+                      _update(false, DateTime.now());
                     },
                     onDaySelected: (day, events) {
                       DateTime date = DateTime.now().add(Duration(days: 1));
@@ -322,7 +322,7 @@ class _IndexScreenState extends State<IndexScreen> {
     });
   }
 
-  void _update() {
+  void _update(bool isNotification, DateTime dateTime) {
     setState(() {
       List<int> level = [0, 0, 0, 0];
       int health = 0;
@@ -358,6 +358,89 @@ class _IndexScreenState extends State<IndexScreen> {
       _focusDate =
           '${_calendarController.focusedDay.year}년 ${_calendarController.focusedDay.month}월';
       _isLiverBroken = health >= 10;
+      if (_isLiverBroken &&
+          isNotification &&
+          dateTime.isAfter(DateTime(date.year, date.month, date.day))) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                        child: Image(
+                          height: 200.0,
+                          image: [
+                            AssetImage('assets/images/reconfirm_1.gif'),
+                            AssetImage('assets/images/reconfirm_2.gif'),
+                            AssetImage('assets/images/reconfirm_3.gif'),
+                          ][Random().nextInt(3)],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        '잦은 음주',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 32.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        '간 손상이 의심됩니다',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18.0,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      ButtonBar(
+                        buttonMinWidth: 80.0,
+                        buttonHeight: 40.0,
+                        alignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          RaisedButton(
+                            child: Text('오케이'),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        );
+      }
+
       int maxVal = level.reduce(max);
       if (maxVal == 0) {
         _bottomColor = Util.getColor(0.0);
@@ -457,6 +540,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       onPressed: rating == _rating
                           ? null
                           : () {
+                              bool isNotification = false;
                               String title = '${day.year % 100}.'
                                   '${day.month < 10 ? '0' : ''}'
                                   '${day.month}.'
@@ -485,6 +569,7 @@ class _IndexScreenState extends State<IndexScreen> {
                                 });
                               } else if (_rating == 0.0) {
                                 // 새로운 음주 기록 추가
+                                isNotification = true;
                                 _historys.add(
                                   History(
                                     dateTime: day,
@@ -506,6 +591,7 @@ class _IndexScreenState extends State<IndexScreen> {
                                 );
                               } else {
                                 // 음주 기록 변경
+                                isNotification = true;
                                 _historys.forEach((element) {
                                   if (element.dateTime.isAtSameMomentAs(day)) {
                                     element.level = rating;
@@ -534,8 +620,8 @@ class _IndexScreenState extends State<IndexScreen> {
                               }
                               widget.prefs
                                   .setStringList('dateHistorys', dateHistorys);
-                              _update();
                               Navigator.of(context).pop();
+                              _update(isNotification, day);
                             },
                     ),
                   ],

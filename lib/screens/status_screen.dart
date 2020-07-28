@@ -117,60 +117,77 @@ class _StatusScreenState extends State<StatusScreen> {
                     });
                   },
                 ),
-                SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.white,
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.sort,
+                          color: Colors.white,
+                        ),
+                        iconSize: 32.0,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       ),
-                      iconSize: 32.0,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.white,
+                        ),
+                        iconSize: 32.0,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
                     ),
                   ),
                 ),
                 _headerList.length > 1
-                    ? Positioned.fill(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: SafeArea(
-                            child: Padding(
-                              padding: EdgeInsets.all(48.0),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white.withOpacity(0.4),
-                                ),
-                                iconSize: 24.0,
-                                onPressed: () {
-                                  _swiperController.previous();
-                                },
+                    ? Align(
+                        alignment: Alignment.centerLeft,
+                        child: SafeArea(
+                          child: Padding(
+                            padding: EdgeInsets.all(48.0),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back_ios,
+                                color: Colors.white.withOpacity(0.4),
                               ),
+                              iconSize: 24.0,
+                              onPressed: () {
+                                _swiperController.previous();
+                              },
                             ),
                           ),
                         ),
                       )
                     : Container(),
                 _headerList.length > 1
-                    ? Positioned.fill(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: SafeArea(
-                            child: Padding(
-                              padding: EdgeInsets.all(48.0),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Colors.white.withOpacity(0.4),
-                                ),
-                                iconSize: 24.0,
-                                onPressed: () {
-                                  _swiperController.next();
-                                },
+                    ? Align(
+                        alignment: Alignment.centerRight,
+                        child: SafeArea(
+                          child: Padding(
+                            padding: EdgeInsets.all(48.0),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.white.withOpacity(0.4),
                               ),
+                              iconSize: 24.0,
+                              onPressed: () {
+                                _swiperController.next();
+                              },
                             ),
                           ),
                         ),
@@ -208,6 +225,13 @@ class _StatusScreenState extends State<StatusScreen> {
                     color: Util.getColor(4.0),
                     width: _level[3]['width'],
                     value: _level[3]['value'],
+                  ),
+                  Text(
+                    '₩1,000',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
