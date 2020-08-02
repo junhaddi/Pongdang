@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class StatusHeader extends StatelessWidget {
-  final String emoji;
+  final String image;
   final DateTime date;
 
   StatusHeader({
-    this.emoji,
+    this.image,
     this.date,
   });
 
@@ -15,11 +15,11 @@ class StatusHeader extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            emoji,
-            style: TextStyle(
-              fontSize: 80.0,
+          Image(
+            image: AssetImage(
+              image,
             ),
+            height: 80.0,
           ),
           SizedBox(
             height: 10.0,

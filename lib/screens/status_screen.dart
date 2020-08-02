@@ -37,16 +37,16 @@ class _StatusScreenState extends State<StatusScreen> {
     if (widget.historys.isEmpty) {
       _backgroundColor = Util.getColor(0.0);
       _headerList
-          .add(Header(emoji: Util.getEmoji(0.0), dateTime: DateTime.now()));
+          .add(Header(image: Util.getImage(0.0), dateTime: DateTime.now()));
     } else {
       setState(() {
-        if (_headerList[0].emoji == Util.getEmoji(4.0)) {
+        if (_headerList[0].image == Util.getImage(4.0)) {
           _backgroundColor = Util.getColor(4.0);
-        } else if (_headerList[0].emoji == Util.getEmoji(3.0)) {
+        } else if (_headerList[0].image == Util.getImage(3.0)) {
           _backgroundColor = Util.getColor(3.0);
-        } else if (_headerList[0].emoji == Util.getEmoji(2.0)) {
+        } else if (_headerList[0].image == Util.getImage(2.0)) {
           _backgroundColor = Util.getColor(2.0);
-        } else if (_headerList[0].emoji == Util.getEmoji(1.0)) {
+        } else if (_headerList[0].image == Util.getImage(1.0)) {
           _backgroundColor = Util.getColor(1.0);
         }
         _level[0]['value'] = _historyList[0][0];
@@ -87,23 +87,23 @@ class _StatusScreenState extends State<StatusScreen> {
                   children: _headerList
                       .map(
                         (Header header) => StatusHeader(
-                          emoji: header.emoji,
+                          image: header.image,
                           date: header.dateTime,
                         ),
                       )
                       .toList(),
                   onIndexChanged: (value) {
                     setState(() {
-                      if (_headerList[value].emoji == Util.getEmoji(4.0)) {
+                      if (_headerList[value].image == Util.getImage(4.0)) {
                         _backgroundColor = Util.getColor(4.0);
-                      } else if (_headerList[value].emoji ==
-                          Util.getEmoji(3.0)) {
+                      } else if (_headerList[value].image ==
+                          Util.getImage(3.0)) {
                         _backgroundColor = Util.getColor(3.0);
-                      } else if (_headerList[value].emoji ==
-                          Util.getEmoji(2.0)) {
+                      } else if (_headerList[value].image ==
+                          Util.getImage(2.0)) {
                         _backgroundColor = Util.getColor(2.0);
-                      } else if (_headerList[value].emoji ==
-                          Util.getEmoji(1.0)) {
+                      } else if (_headerList[value].image ==
+                          Util.getImage(1.0)) {
                         _backgroundColor = Util.getColor(1.0);
                       }
                       _level[0]['value'] = _historyList[value][0];
@@ -116,24 +116,6 @@ class _StatusScreenState extends State<StatusScreen> {
                       _level[3]['width'] = _historyList[value][7];
                     });
                   },
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: SafeArea(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.sort,
-                          color: Colors.white,
-                        ),
-                        iconSize: 32.0,
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ),
-                  ),
                 ),
                 Align(
                   alignment: Alignment.topRight,
@@ -203,35 +185,28 @@ class _StatusScreenState extends State<StatusScreen> {
               child: Column(
                 children: <Widget>[
                   StatusGraph(
-                    emoji: Util.getEmoji(1.0),
+                    image: Util.getImage(1.0),
                     color: Util.getColor(1.0),
                     width: _level[0]['width'],
                     value: _level[0]['value'],
                   ),
                   StatusGraph(
-                    emoji: Util.getEmoji(2.0),
+                    image: Util.getImage(2.0),
                     color: Util.getColor(2.0),
                     width: _level[1]['width'],
                     value: _level[1]['value'],
                   ),
                   StatusGraph(
-                    emoji: Util.getEmoji(3.0),
+                    image: Util.getImage(3.0),
                     color: Util.getColor(3.0),
                     width: _level[2]['width'],
                     value: _level[2]['value'],
                   ),
                   StatusGraph(
-                    emoji: Util.getEmoji(4.0),
+                    image: Util.getImage(4.0),
                     color: Util.getColor(4.0),
                     width: _level[3]['width'],
                     value: _level[3]['value'],
-                  ),
-                  Text(
-                    '₩1,000',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ],
               ),
@@ -264,17 +239,17 @@ class _StatusScreenState extends State<StatusScreen> {
           afterDateTime = DateTime(afterDateTime.year, afterDateTime.month);
           if (dateTime.isAfter(afterDateTime)) {
             double maxVal = level.reduce(max);
-            String emoji;
+            String image;
             if (maxVal == level[3]) {
-              emoji = Util.getEmoji(4.0);
+              image = Util.getImage(4.0);
             } else if (maxVal == level[2]) {
-              emoji = Util.getEmoji(3.0);
+              image = Util.getImage(3.0);
             } else if (maxVal == level[1]) {
-              emoji = Util.getEmoji(2.0);
+              image = Util.getImage(2.0);
             } else if (maxVal == level[0]) {
-              emoji = Util.getEmoji(1.0);
+              image = Util.getImage(1.0);
             }
-            _headerList.add(Header(emoji: emoji, dateTime: dateTime));
+            _headerList.add(Header(image: image, dateTime: dateTime));
             level[4] = (level[0] / maxVal) * 220 + 12;
             level[5] = (level[1] / maxVal) * 220 + 12;
             level[6] = (level[2] / maxVal) * 220 + 12;
@@ -285,17 +260,17 @@ class _StatusScreenState extends State<StatusScreen> {
           }
         } else {
           double maxVal = level.reduce(max);
-          String emoji;
+          String image;
           if (maxVal == level[3]) {
-            emoji = Util.getEmoji(4.0);
+            image = Util.getImage(4.0);
           } else if (maxVal == level[2]) {
-            emoji = Util.getEmoji(3.0);
+            image = Util.getImage(3.0);
           } else if (maxVal == level[1]) {
-            emoji = Util.getEmoji(2.0);
+            image = Util.getImage(2.0);
           } else if (maxVal == level[0]) {
-            emoji = Util.getEmoji(1.0);
+            image = Util.getImage(1.0);
           }
-          _headerList.add(Header(emoji: emoji, dateTime: dateTime));
+          _headerList.add(Header(image: image, dateTime: dateTime));
           level[4] = (level[0] / maxVal) * 220 + 12;
           level[5] = (level[1] / maxVal) * 220 + 12;
           level[6] = (level[2] / maxVal) * 220 + 12;

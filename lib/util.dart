@@ -17,20 +17,20 @@ class Util {
     return color;
   }
 
-  static String getEmoji(double val) {
-    String emoji;
+  static String getImage(double val) {
+    String image;
     if (val == 0.0) {
-      emoji = '🥰';
+      image = 'assets/images/level_1.png';
     } else if (val == 1.0) {
-      emoji = '😅';
+      image = 'assets/images/level_2.png';
     } else if (val == 2.0) {
-      emoji = '😔';
+      image = 'assets/images/level_3.png';
     } else if (val == 3.0) {
-      emoji = '😭';
+      image = 'assets/images/level_4.png';
     } else if (val == 4.0) {
-      emoji = '😡';
+      image = 'assets/images/level_5.png';
     }
-    return emoji;
+    return image;
   }
 
   static String getWeekday(int val) {

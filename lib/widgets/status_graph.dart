@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class StatusGraph extends StatelessWidget {
-  final String emoji;
+  final String image;
   final Color color;
   final double width;
   final double value;
 
   StatusGraph({
-    this.emoji,
+    this.image,
     this.color,
     this.width,
     this.value,
@@ -21,11 +21,11 @@ class StatusGraph extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text(
-                emoji,
-                style: TextStyle(
-                  fontSize: 32.0,
+              Image(
+                image: AssetImage(
+                  image,
                 ),
+                height: 32.0,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.0),

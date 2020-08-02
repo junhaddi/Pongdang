@@ -236,6 +236,7 @@ class _IndexScreenState extends State<IndexScreen> {
                                     _subtitle,
                                     style: TextStyle(
                                       fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   Image(
@@ -275,11 +276,11 @@ class _IndexScreenState extends State<IndexScreen> {
                                             title: Text(
                                               history.title,
                                             ),
-                                            trailing: Text(
-                                              Util.getEmoji(history.level),
-                                              style: TextStyle(
-                                                fontSize: 32.0,
+                                            trailing: Image(
+                                              image: AssetImage(
+                                                Util.getImage(history.level),
                                               ),
+                                              height: 32.0,
                                             ),
                                           ),
                                         ),
@@ -484,11 +485,11 @@ class _IndexScreenState extends State<IndexScreen> {
                 SizedBox(
                   height: 10.0,
                 ),
-                Text(
-                  Util.getEmoji(rating),
-                  style: TextStyle(
-                    fontSize: 48.0,
+                Image(
+                  image: AssetImage(
+                    Util.getImage(rating),
                   ),
+                  height: 48.0,
                 ),
                 SizedBox(
                   height: 10.0,

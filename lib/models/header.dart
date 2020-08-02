@@ -1,6 +1,6 @@
 class Header {
   final DateTime dateTime;
-  final String emoji;
+  final String image;
 
-  Header({this.dateTime, this.emoji});
+  Header({this.dateTime, this.image});
 }
